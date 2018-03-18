@@ -13,4 +13,6 @@ app.post('/register/', UM.register);
 
 app.get('/users/', UM.displayList);
 
+app.post('/login/', UM.login);
+
 app.listen(4000);

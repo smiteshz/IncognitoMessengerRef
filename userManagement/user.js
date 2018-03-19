@@ -21,6 +21,7 @@ module.exports.register = (req, res) => {
 };
 
 module.exports.displayList = (req, res) => {
+<<<<<<< HEAD
     //res.json();
     userModel.find({}).then(result=> {
         console.log(result);
@@ -32,6 +33,15 @@ module.exports.displayList = (req, res) => {
         res.json({success: false});
         }
     )
+=======
+    userModel.find((err, people) => {
+        if (err) return res.status(500).send('There are no users');
+        else
+        {
+            return res.json(people);
+        }
+    });
+>>>>>>> 1f42b38c5921c63fd06428330108b49cff785a37
 };
 
 module.exports.login = (req, res) => {
@@ -43,8 +53,10 @@ module.exports.login = (req, res) => {
         //token = res.body.token;
         jwt.verify(token, secret, (err, decoded) => {
             if (err) return res.status(500).json({success: false});
-            console.log("User has already logged in");
-            return res.status(200).json({success: true});
+            if (decoded.userName === usrname && decoded.password === pswd){
+                return res.status(200).json({success: true});
+            }
+            return res.status(404).json({success: false});
         });
 
     }
@@ -55,10 +67,13 @@ module.exports.login = (req, res) => {
             }
             else{
                 console.log(`User found: ${usrname}`);
-                jwt.sign({userName: usrname, password: pswd}, secret, (err, token) => {
+                jwt.sign({userName: usrname, password: pswd}, secret, (err, tken) => {
                     if (err) return res.status(500).send(err);
-                    console.log(`Token Generated!: ${token}`);
-                    res.json({success: true, userName: usrname, 'token': token});
+                    console.log(`Token Generated!: ${tken}`);
+                    userModel.findOneAndUpdate({userName: usrname},{token: tken}, (err, people) => {
+                        if (err) res.status(500).send("Internal server error");
+                    });
+                    res.json({success: true, userName: usrname, 'token': tken});
                 });
                 return;
             }

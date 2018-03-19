@@ -21,7 +21,17 @@ module.exports.register = (req, res) => {
 };
 
 module.exports.displayList = (req, res) => {
-    res.json();
+    //res.json();
+    userModel.find({}).then(result=> {
+        console.log(result);
+       // res.send(result);
+        res.json(result);
+    
+    }).catch(err=> {
+        if(err) console.log(err);
+        res.json({success: false});
+        }
+    )
 };
 
 module.exports.login = (req, res) => {

@@ -21,9 +21,8 @@ module.exports.register = (req, res) => {
 };
 
 module.exports.displayList = (req, res) => {
-<<<<<<< HEAD
     //res.json();
-    userModel.find({}).then(result=> {
+   /* userModel.find({}).then(result=> {
         console.log(result);
        // res.send(result);
         res.json(result);
@@ -32,8 +31,7 @@ module.exports.displayList = (req, res) => {
         if(err) console.log(err);
         res.json({success: false});
         }
-    )
-=======
+    )*/
     userModel.find((err, people) => {
         if (err) return res.status(500).send('There are no users');
         else
@@ -41,7 +39,6 @@ module.exports.displayList = (req, res) => {
             return res.json(people);
         }
     });
->>>>>>> 1f42b38c5921c63fd06428330108b49cff785a37
 };
 
 module.exports.login = (req, res) => {

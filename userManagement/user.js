@@ -1,11 +1,14 @@
 const mongoose = require('mongoose');
 const  jwt = require('jsonwebtoken');
 const secret = "totallysecret";
+//const webSocketServer = require('websocket').Server;
+
 let userModel = mongoose.model("user");
+let messageModel = mongoose.model("message");
 
 module.exports.register = (req, res) => {
-    console.log(`Here's the request body: `);
-    console.log(req.body);
+    // console.log(`Here's the request body: `);
+    // console.log(req.body);
     newUser = new userModel(
         req.body
     );
@@ -15,7 +18,7 @@ module.exports.register = (req, res) => {
     }).catch(
         err => {
             if (err) console.log(err);
-            res.json({success: false})
+            res.json({success: false, stackTrace: err});
         }
     )    
 };
@@ -32,6 +35,7 @@ module.exports.displayList = (req, res) => {
         res.json({success: false});
         }
     )*/
+
     userModel.find((err, people) => {
         if (err) return res.status(500).send('There are no users');
         else
@@ -47,7 +51,6 @@ module.exports.login = (req, res) => {
     token = req.body.token;
     if (token != "null")
     {
-        //token = res.body.token;
         jwt.verify(token, secret, (err, decoded) => {
             if (err) return res.status(500).json({success: false});
             if (decoded.userName === usrname && decoded.password === pswd){
@@ -55,7 +58,6 @@ module.exports.login = (req, res) => {
             }
             return res.status(404).json({success: false});
         });
-
     }
     else{
         userModel.find({userName: usrname, password: pswd}, (err, people) => {
@@ -76,6 +78,33 @@ module.exports.login = (req, res) => {
             }
         });
     }
-    // res.json({success: true});
 };
 
+module.exports.sendMsg = (req, res) => {
+    try{
+        token = req.body.token;
+        if (token != "null")
+        {
+        jwt.verify(token, secret, (err, decoded) => {
+            if (err) return res.status(500).json({success: false});
+            console.log("Decoded string:", decoded);
+            userModel.findOne({username: decoded.username, password: decoded.password},(err, person) => {
+                if (err) return res.status(401).json({error: "Unauthorized User", stackTrace: err});
+                let newMsg = new messageModel(
+                    req.body
+                )
+                newMsg.save().then(result => {
+                    return res.status(200).json({success: true, stackTrace:"Message Sent"});
+                }).catch(err =>
+                {
+                    console.log(err);
+                    return res.status(500).json({success: false, stackTrace: err});
+                });
+            });
+        });
+    }
+    }
+    catch (err){
+        return res.status(401).json({error: "Invalid WebToken", stackTrace: err});
+    }
+    };

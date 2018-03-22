@@ -117,3 +117,17 @@ module.exports.sendMsg = (req, res) => {
         return res.status(401).json({error: "Invalid WebToken", stackTrace: err});
     }
     };
+
+module.exports.getMsg = (req, res) => {
+    let usrname = req.params.username;
+
+};
+
+
+module.exports.testReq = (req, res) => {
+    console.log("Here");
+    console.log(req.get('Sender'));
+    console.log(req.get('Receiver'));
+    console.log(req.get('Authorization'));
+    return res.status(200).send("bleh");
+}

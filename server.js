@@ -21,4 +21,8 @@ app.post('/login/', UM.login);
 
 app.post('/messages/send/', UM.sendMsg);
 
+app.get('/message/get/:username', UM.getMsg);
+
+app.get('/test/', UM.testReq);
+
 app.listen(4000);

@@ -6,14 +6,17 @@ const UM = require('./userManagement/user.js');
 
 const app = express();
 
+app.set('view engine', 'ejs');
+
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-
+app.get('/register/', UM.getRegister);
 app.post('/register/', UM.register);
 
 app.get('/users/', UM.displayList);
 
+app.get('/login/', UM.getLogin);
 app.post('/login/', UM.login);
 
 app.post('/messages/send/', UM.sendMsg);

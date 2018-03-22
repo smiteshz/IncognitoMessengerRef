@@ -6,6 +6,10 @@ const secret = "totallysecret";
 let userModel = mongoose.model("user");
 let messageModel = mongoose.model("message");
 
+module.exports.getRegister = (req, res) => {
+    res.render('register');
+};
+
 module.exports.register = (req, res) => {
     // console.log(`Here's the request body: `);
     // console.log(req.body);
@@ -45,7 +49,12 @@ module.exports.displayList = (req, res) => {
     });
 };
 
+module.exports.getLogin = (req, res) => {
+    res.render('login');
+};
+
 module.exports.login = (req, res) => {
+    console.log(req.body);
     usrname = req.body.userName;
     pswd = req.body.password;
     token = req.body.token;

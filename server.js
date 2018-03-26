@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('./mongoose')();
 const bodyParser = require('body-parser');
+const websocket = require('socket.io');
 const UM = require('./userManagement/user.js');
 
 
@@ -19,6 +20,7 @@ app.get('/users/', UM.displayList);
 app.get('/login/', UM.getLogin);
 app.post('/login/', UM.login);
 
+app.get('/websocket/', UM.webSocketTest);
 app.post('/messages/send/', UM.sendMsg);
 
 app.get('/message/get/:username', UM.getMsg);

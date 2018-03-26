@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
 const  jwt = require('jsonwebtoken');
 const secret = "totallysecret";
-//const webSocketServer = require('websocket').Server;
-
+const websocket =  require('socket.io');
 let userModel = mongoose.model("user");
 let messageModel = mongoose.model("message");
 
@@ -97,8 +96,10 @@ module.exports.sendMsg = (req, res) => {
         jwt.verify(token, secret, (err, decoded) => {
             if (err) return res.status(500).json({success: false});
             console.log("Decoded string:", decoded);
+            websocket.listen(4001).sockets;
             userModel.findOne({username: decoded.username, password: decoded.password},(err, person) => {
                 if (err) return res.status(401).json({error: "Unauthorized User", stackTrace: err});
+
                 let newMsg = new messageModel(
                     req.body
                 )
@@ -130,4 +131,8 @@ module.exports.testReq = (req, res) => {
     console.log(req.get('Receiver'));
     console.log(req.get('Authorization'));
     return res.status(200).send("bleh");
+}
+
+module.exports.webSocketTest = (req, res) =>{
+    console.log("Connecting to websocket");
 }

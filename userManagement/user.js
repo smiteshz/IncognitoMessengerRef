@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const  jwt = require('jsonwebtoken');
 const secret = "totallysecret";
-const websocket =  require('socket.io');
 let userModel = mongoose.model("user");
 let messageModel = mongoose.model("message");
 
@@ -27,18 +26,6 @@ module.exports.register = (req, res) => {
 };
 
 module.exports.displayList = (req, res) => {
-    //res.json();
-   /* userModel.find({}).then(result=> {
-        console.log(result);
-       // res.send(result);
-        res.json(result);
-    
-    }).catch(err=> {
-        if(err) console.log(err);
-        res.json({success: false});
-        }
-    )*/
-
     userModel.find((err, people) => {
         if (err) return res.status(500).send('There are no users');
         else
@@ -125,14 +112,42 @@ module.exports.getMsg = (req, res) => {
 };
 
 
-module.exports.testReq = (req, res) => {
-    console.log("Here");
-    console.log(req.get('Sender'));
-    console.log(req.get('Receiver'));
-    console.log(req.get('Authorization'));
-    return res.status(200).send("bleh");
+module.exports.webSocketTest = (client) =>{
+    console.log("Client is connected");
+    client.on('message', (data) => {
+        // Validate the token
+        token = data.token;
+        var decoded = jwt.verify(token, secret);
+        console.log("Decoded string:", decoded);
+        userModel.findOne({username: decoded.username, password: decoded.password},(err, person) => {
+        if (err)
+        {
+            console.log(err);
+            return client.emit('ack', "Unable to send message, authToken invalid");
+        }
+        else 
+        {   
+            console.log("Match found!");
+            let newMsg = new messageModel(
+                data
+            )
+            newMsg.save().then(result => {
+                console.log("Success!");
+                return client.emit('ack', "Message successfully sent");
+            }).catch(err =>
+            {
+                console.log(err);
+                return client.emit('ack', `Message sending failed,\n stack trace: ${err}`);
+            });
+        }
+    });
+    });   
 }
 
-module.exports.webSocketTest = (req, res) =>{
-    console.log("Connecting to websocket");
+module.exports.entryPage = (req, res) => {
+    res.sendFile(__dirname + '/hello.html');
+}
+
+validationCheck = (authtoken) => {
+    let checker = false;
 }

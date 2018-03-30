@@ -112,7 +112,10 @@ module.exports.getMsg = (req, res) => {
 };
 
 
-module.exports.webSocketTest = (client) =>{
+/*module.exports.webSocketTest = (client) =>{
+    client.on('ack', (msg) => {
+        console.log('message: '+msg);
+    });
     console.log("Client is connected");
     client.on('message', (data) => {
         // Validate the token
@@ -123,7 +126,7 @@ module.exports.webSocketTest = (client) =>{
         if (err)
         {
             console.log(err);
-            return client.emit('ack', "Unable to send message, authToken invalid");
+            client.emit('ack', "Unable to send message, authToken invalid");
         }
         else 
         {   
@@ -133,19 +136,26 @@ module.exports.webSocketTest = (client) =>{
             )
             newMsg.save().then(result => {
                 console.log("Success!");
-                return client.emit('ack', "Message successfully sent");
+                client.emit('ack', "Message successfully sent");
             }).catch(err =>
             {
                 console.log(err);
-                return client.emit('ack', `Message sending failed,\n stack trace: ${err}`);
+                client.emit('ack', `Message sending failed,\n stack trace: ${err}`);
             });
         }
     });
-    });   
+    });  
+    client.on('chat message', (msg)=> {
+        console.log('message:' +msg);
+        
+    });
+    client.on('disconnect', ()=> {
+        console.log('Client is disconnected');
+    }) ;
 }
-
+*/
 module.exports.entryPage = (req, res) => {
-    res.sendFile(__dirname + '/hello.html');
+    res.render('index');
 }
 
 validationCheck = (authtoken) => {

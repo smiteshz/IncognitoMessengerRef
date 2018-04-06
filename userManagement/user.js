@@ -160,14 +160,27 @@ module.exports.webSocketTest = (client) =>{
         }
     });
     });  
-    client.on('chat message', (msg)=> {
-        console.log('message:' +msg);
-        
-    });
-    client.on('disconnect', ()=> {
-        console.log('Client is disconnected');
-    }) ;
-}
+    client.on('getmessages', (data) => {
+        usrname = data.username;
+        // Validate the token
+        token = data.token;
+        var decoded = jwt.verify(token, secret);
+        console.log("Decoded string:", decoded);
+        userModel.findOne({username: decoded.username, password: decoded.password},(err, person) => {
+        if (err)
+        {
+            console.log(err);
+            client.emit('ack', "Unable to send message, authToken invalid");
+        }
+        else 
+        {   
+            console.log("Match found!");
+            messageModel.find({receiverName : usrname}, (err, messages) => {
+                client.emit('retrivedmessages', messages);
+            })
+        }
+    }
+    );
 
 module.exports.entryPage = (req, res) => {
     res.render('index');

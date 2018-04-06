@@ -4,6 +4,11 @@ const secret = "totallysecret";
 let userModel = mongoose.model("user");
 let messageModel = mongoose.model("message");
 
+if (typeof localStorage === "undefined" || localStorage === null) {
+    var LocalStorage = require('node-localstorage').LocalStorage;
+    localStorage = new LocalStorage('./scratch');
+  }
+
 module.exports.getRegister = (req, res) => {
     res.render('register');
 };
@@ -76,6 +81,8 @@ module.exports.login = (req, res) => {
                 jwt.sign({userName: usrname, password: pswd}, secret, (err, tken) => {
                     if (err) return res.status(500).send(err);
                     console.log(`Token Generated!: ${tken}`);
+                    localStorage.setItem('webtoken',String(tken));
+                    console.log(localStorage.getItem('webtoken'));
                     userModel.findOneAndUpdate({userName: usrname},{token: tken}, (err, people) => {
                         if (err) res.status(500).send("Internal server error");
                     });
@@ -161,7 +168,8 @@ module.exports.webSocketTest = (client) =>{
     }); 
     });
     client.on('getmessages', (data) => {
-        usrname = data.username;
+        console.log('Getting Messages', data.userName);
+        usrname = data.userName;
         // Validate the token
         token = data.token;
         var decoded = jwt.verify(token, secret);
@@ -174,9 +182,9 @@ module.exports.webSocketTest = (client) =>{
         }
         else 
         {   
-            console.log("Match found!");
             messageModel.find({receiverName : usrname}, (err, messages) => {
-                client.emit('retrivedmessages', messages);
+                console.log(messages);
+                client.emit('retrievedmessages', messages);
             })
         }
         });

@@ -45,22 +45,51 @@ module.exports.getLogin = (req, res) => {
 };
 
 module.exports.login = (req, res) => {
+    username = req.body.userName;
+    userModel.findOne({userName: username}, (err, people) => {
+        if (err) return res.status(404).send("User not found");
+        else if(req.body.token)
+        {
+            userModel.findOne({userName: people.username, token: req.body.token}, (err, people) => {
+                if (err) return res.status(401).send("Access Denied, Invalid Token");
+                else{
+                    res.status(200).send("Access Granted, Token valid");
+                }
+            })
+        }
+        else if (req.body.password)
+        {
+            userModel.findOne({userName: people.username, password: req.body.password}, (err, people) => {
+                if (err) return res.status(401).send("Access Denied, Invalid Password");
+                else{
+                    jwt.sign({userName: people.username, password: req.body.password, log: true}, secret, (err, token) => {
+                        userModel.findOneAndUpdate({userName: people.username, password: req.body.password, token: token}, (err, people) => {
+                            if (err) return console.log(err);
+                            else{
+                                res.status(200).send("Access Granted, Token Validated");
+                            }
+                        });
+                    });
+                }
+            })
+        }
+    })
+}
+
+
+module.exports.oldlogin = (req, res) => {
     console.log(req.body);
     usrname = req.body.userName;
     pswd = req.body.password;
-   // token = req.body.token;
-    userModel.findOne({userName: usrname, password: pswd}, (err, people) => {
-        if(err) {
-            return res.status(404).send('User Not Found');
-        }
-        else{
-            token = people.token;
-       
+   //token = req.body.token;
+    userModel.findOne({userName: usrname}, (err, people) => {
+    if(err) {
+        return res.status(404).send('User Not Found');
+    }
+    else{
+        token = people.token;
     if (token != "null")
     {   
-        console.log('Token is not null');
-        console.log(token);
-
         jwt.verify(token, secret, (err, decoded) => {
             if (err) return res.status(500).json({success: false});
             if (decoded.userName === usrname && decoded.password === pswd){
@@ -78,7 +107,7 @@ module.exports.login = (req, res) => {
             }
             else{
                 console.log(`User found: ${usrname}`);
-                jwt.sign({userName: usrname, password: pswd}, secret, (err, tken) => {
+                jwt.sign({userName: usrname, password: pswd, valid : true}, secret, (err, tken) => {
                     if (err) return res.status(500).send(err);
                     console.log(`Token Generated!: ${tken}`);
                     localStorage.setItem('webtoken',String(tken));
@@ -126,12 +155,16 @@ module.exports.sendMsg = (req, res) => {
     catch (err){
         return res.status(401).json({error: "Invalid WebToken", stackTrace: err});
     }
-    };
+}
 
-module.exports.getMsg = (req, res) => {
-    let usrname = req.params.username;
 
-};
+
+module.exports.logOut = (req, res) => {
+    userName = req.body.userName;
+    userModel.findOneAndUpdate({userName: userName, token: 'null'})
+    .then(bleh => res.status(200).send("Successfully Logged out"))
+    .catch(err => res.status(500));
+}
 
 
 module.exports.webSocketTest = (client) =>{
@@ -144,7 +177,7 @@ module.exports.webSocketTest = (client) =>{
         token = data.token;
         var decoded = jwt.verify(token, secret);
         console.log("Decoded string:", decoded);
-        userModel.findOne({username: decoded.username, password: decoded.password},(err, person) => {
+        userModel.findOne({username: decoded.username, token: data.token},(err, person) => {
         if (err)
         {
             console.log(err);
@@ -174,11 +207,11 @@ module.exports.webSocketTest = (client) =>{
         token = data.token;
         var decoded = jwt.verify(token, secret);
         console.log("Decoded string:", decoded);
-        userModel.findOne({username: decoded.username, password: decoded.password},(err, person) => {
+        userModel.findOne({username: decoded.username, token: data.token},(err, person) => {
         if (err)
         {
             console.log(err);
-            client.emit('ack', "Unable to send message, authToken invalid");
+            client.emit('ack', "Unable to get messages, authToken invalid");
         }
         else 
         {   
@@ -193,8 +226,4 @@ module.exports.webSocketTest = (client) =>{
 
 module.exports.entryPage = (req, res) => {
     res.render('index');
-}
-
-validationCheck = (authtoken) => {
-    let checker = false;
 }

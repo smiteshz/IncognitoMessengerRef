@@ -26,12 +26,13 @@ app.get('/users/', UM.displayList);
 app.get('/login/', UM.getLogin);
 app.post('/login/', UM.login);
 
+app.post('/logout/', UM.logOut);
+
 io.on('connection', UM.webSocketTest);
 
 
 app.post('/messages/send/', UM.sendMsg);
 
-app.get('/message/get/:username', UM.getMsg);
 
 
 server.listen(5000);

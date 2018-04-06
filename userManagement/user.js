@@ -158,8 +158,8 @@ module.exports.webSocketTest = (client) =>{
                 client.emit('ack', `Message sending failed,\n stack trace: ${err}`);
             });
         }
+    }); 
     });
-    });  
     client.on('getmessages', (data) => {
         usrname = data.username;
         // Validate the token
@@ -179,8 +179,9 @@ module.exports.webSocketTest = (client) =>{
                 client.emit('retrivedmessages', messages);
             })
         }
-    }
-    );
+        });
+    });
+}
 
 module.exports.entryPage = (req, res) => {
     res.render('index');

@@ -43,14 +43,26 @@ module.exports.login = (req, res) => {
     console.log(req.body);
     usrname = req.body.userName;
     pswd = req.body.password;
-    token = req.body.token;
+   // token = req.body.token;
+    userModel.find({userName: usrname, password: pswd}, (err, people) => {
+        if(err) {
+            return res.status(404).send('User Not Found');
+        }
+        else{
+            token = people[0].token;
+       
     if (token != "null")
-    {
+    {   
+        console.log('Token is not null');
+        console.log(token);
+
         jwt.verify(token, secret, (err, decoded) => {
             if (err) return res.status(500).json({success: false});
             if (decoded.userName === usrname && decoded.password === pswd){
-                return res.status(200).json({success: true});
+                console.log(decoded);
+                return res.status(200).render('index');
             }
+            
             return res.status(404).json({success: false});
         });
     }
@@ -73,6 +85,8 @@ module.exports.login = (req, res) => {
             }
         });
     }
+}
+});
 };
 
 module.exports.sendMsg = (req, res) => {

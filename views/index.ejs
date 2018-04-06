@@ -23,6 +23,7 @@
     <script>
         $(function () {
           var socket = io();
+          socket.emit('getmessages', {userName: usrname, token: 'token'});
           $('form').submit(function(){
             socket.emit('message', {senderName: 'smitesh', receiverName: 'smith',token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InNtaXRlc2giLCJwYXNzd29yZCI6InNhd2FudCIsImlhdCI6MTUyMzA0NDE0Mn0.OXpSvAgmCjAdPSrOq_u8n8V3vRrvsHNxJFUPEFA1uXc', messageBody: $('#m').val(), timeSent: 213413});
             $('#m').val('');
@@ -30,6 +31,13 @@
           });
           socket.on('message', function(msg){
             $('#messages').append($('<li>').text(msg));
+          });
+          socket.on('retrieved messages',function(msg){
+            msg.forEach(element => {
+              $('#messages').append($('<li>').text(element));
+              
+            });
+
           });
         });
       </script>

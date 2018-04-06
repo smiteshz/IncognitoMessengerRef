@@ -7,4 +7,7 @@ module.exports = () => {
     });
     require('./userManagement/user.schema');
     require('./userManagement/message.schema');
+    let userModel = mongoose.model("user");
+let messageModel = mongoose.model("message");
+
 }

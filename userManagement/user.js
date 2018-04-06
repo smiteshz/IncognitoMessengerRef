@@ -44,12 +44,12 @@ module.exports.login = (req, res) => {
     usrname = req.body.userName;
     pswd = req.body.password;
    // token = req.body.token;
-    userModel.find({userName: usrname, password: pswd}, (err, people) => {
+    userModel.findOne({userName: usrname, password: pswd}, (err, people) => {
         if(err) {
             return res.status(404).send('User Not Found');
         }
         else{
-            token = people[0].token;
+            token = people.token;
        
     if (token != "null")
     {   
@@ -79,7 +79,8 @@ module.exports.login = (req, res) => {
                     userModel.findOneAndUpdate({userName: usrname},{token: tken}, (err, people) => {
                         if (err) res.status(500).send("Internal server error");
                     });
-                    res.json({success: true, userName: usrname, 'token': tken});
+                    res.render('index');
+                    //res.json({success: true, userName: usrname, 'token': tken});
                 });
                 return;
             }
@@ -126,7 +127,7 @@ module.exports.getMsg = (req, res) => {
 };
 
 
-/*module.exports.webSocketTest = (client) =>{
+module.exports.webSocketTest = (client) =>{
     client.on('ack', (msg) => {
         console.log('message: '+msg);
     });
@@ -167,7 +168,7 @@ module.exports.getMsg = (req, res) => {
         console.log('Client is disconnected');
     }) ;
 }
-*/
+
 module.exports.entryPage = (req, res) => {
     res.render('index');
 }

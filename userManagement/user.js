@@ -161,7 +161,7 @@ module.exports.sendMsg = (req, res) => {
 
 module.exports.logOut = (req, res) => {
     userName = req.body.userName;
-    userModel.findOneAndUpdate({userName: userName, token: 'null'})
+    userModel.findOneAndUpdate({userName: userName}, {token: 'null'}) 
     .then(bleh => res.status(200).send("Successfully Logged out"))
     .catch(err => res.status(500));
 }
@@ -200,6 +200,7 @@ module.exports.webSocketTest = (client) =>{
         }
     }); 
     });
+
     client.on('getmessages', (data) => {
         console.log('Getting Messages', data.userName);
         usrname = data.userName;
@@ -225,5 +226,32 @@ module.exports.webSocketTest = (client) =>{
 }
 
 module.exports.entryPage = (req, res) => {
-    res.render('index');
+    res.render('startPage');
+}
+
+module.exports.verify = (req, res) => {
+    if (req.get("Authentication"))
+    {
+        token = req.get("Authentication")
+        if (tokenValidation(token))
+        {
+            res.render('index');
+        }
+        else
+        {
+            res.render('login');
+        }
+    }
+    else{
+        res.render('login');
+    }
+}
+
+tokenValidation = (tokenString) => {
+    var result = false;
+    decoded = jwt.verify(tokenString, secret);
+    userModel.findOne({userName: decoded.userName, password: decoded.password})
+    .then(detected => {result = true})
+    .catch(err => {result = false});
+    return result;
 }

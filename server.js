@@ -20,6 +20,7 @@ app.use(bodyParser.json());
 app.get('/', UM.entryPage);
 app.get('/register/', UM.getRegister);
 app.post('/register/', UM.register);
+app.get('/verify/', UM.verify);
 
 app.get('/users/', UM.displayList);
 

@@ -6,4 +6,7 @@ module.exports = () => {
         if (err) console.log("Invalid Connection");
     });
     require('./userManagement/user.schema');
+    require('./userManagement/message.schema');
+    mongoose.Promise = Promise;
+
 }

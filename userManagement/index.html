@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+  
+<html lang="en">  
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Websocket Test</title>
+    </head>
+    <body>
+        <h1>Hello World!</h1>
+        <div id="future"></div>
+        <form id="form" id="chat_form">
+            <input id="chat_input" type="text">
+            <input type="submit" value="Send">
+        </form>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.4/socket.io.js"></script>
+        <script>  
+            var socket = io.connect('http://localhost:5000');
+            socket.on('connect', function(data) {
+               socket.emit('message', {"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6IlNtaXRlc2giLCJwYXNzd29yZCI6ImFiYzIzNCIsImlhdCI6MTUyMTQyOTYzNX0.sr6-E7-7MlggcMjdzVM-UfvSRNgnjIgCvdU3nGSzvS0", "senderName": "Smitesh", "receiverName": "Shreyas", "messageBody": "Hello there fwaggot!", "timeSent" : 1330});
+            });
+            socket.on('ack', (data) => {
+                console.log(data);
+            });
+        </script>  
+    </body>
+</html>  

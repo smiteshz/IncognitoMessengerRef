@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ## Welcome to GitHub Pages
 
 You can use the [editor on GitHub](https://github.com/smiteshz/IncognitoMessengerRef/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
@@ -35,3 +36,28 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 ### Support or Contact
 
 Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+=======
+# IncognitoMessengerRef
+<div align = "Center">A Secure WebChat Application with WebSockets!</div>
+
+## Installation
+
+1. Downloading the Framework using Github :
+
+    ``` shell
+    git clone https://github.com/smiteshz/IncognitoMessengerRef.git```
+
+2. Server Configuration :
+
+    Edit the file *config.js* 
+    ```javascript
+     module.exports.configuration = {port: __PortNumber, dbconnection: "mongodb://__server:__port/__database"};
+     ```
+
+3. Launching the server:
+
+    ```shell
+    npm start 
+    ```
+
+>>>>>>> development

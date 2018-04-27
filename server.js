@@ -34,6 +34,4 @@ io.on('connection', UM.webSocketTest);
 
 app.post('/messages/send/', UM.sendMsg);
 
-
-
 server.listen(5000);

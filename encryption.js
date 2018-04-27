@@ -27,9 +27,5 @@ decryption = (data, key) => {
     return decrypted;
 }
 
-enc_non_repudiation = (data, key, metadata) => {
-    
-}
-
 let ciphertext = encryption("Hello World", "cat");
 console.log(decryption(ciphertext, "cat"));

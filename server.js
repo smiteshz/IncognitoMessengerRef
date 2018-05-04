@@ -1,37 +1,46 @@
+//Imports
+const mongoose = require('mongoose');
 const express = require('express');
-const mongoose = require('./mongoose')();
+const configDB = require('./config/database');
 const bodyParser = require('body-parser');
-const  jwt = require('jsonwebtoken');
 const secret = "totallysecret";
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io').listen(server);
-const UM = require('./userManagement/user.js');
 
+const port = process.env.port || 4000;
 
+var morgan = require('morgan');
 
+var passport = require('passport');
+var flash = require('connect-flash');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
 
+//Configuration
+mongoose.connect(configDB.url);
+require('./config/passport')(passport);
 
 app.set('view engine', 'ejs');
 
+app.use(morgan('dev')); //Logging
+app.use(cookieParser()); //Parsing Cookie information
 app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
-app.get('/', UM.entryPage);
-app.get('/register/', UM.getRegister);
-app.post('/register/', UM.register);
-app.get('/verify/', UM.verify);
 
-app.get('/users/', UM.displayList);
+app.use(session({
+    secret: secret,
+    resave: true,
+    saveUninitialized: true
+})); // 
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(flash());
 
-app.get('/login/', UM.getLogin);
-app.post('/login/', UM.login);
+// Redirecting the routes
 
-app.post('/logout/', UM.logOut);
-
-io.on('connection', UM.webSocketTest);
+require('./app/routes')(app, passport, io);
 
 
-app.post('/messages/send/', UM.sendMsg);
-
-server.listen(5000);
+server.listen(port);

@@ -2,27 +2,34 @@ const mongoose  =  require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
 
 let userSchema = mongoose.Schema({
-    userName: {
-        type : String,
-        required : true
+    local: {
+        userName: {
+            type : String
+        },
+        password : {
+            type : String
+            // required : true
+        },
+        email : {
+            type : String
+            // required : true
+        },
+        verified : {
+            type : Boolean,
+            // required : false,
+            default : false
+        },
+        token : {
+            type : String,
+            // required : false,
+            default : "null"
+        }
     },
-    password : {
-        type : String,
-        required : true
-    },
-    email : {
-        type : String,
-        required : true
-    },
-    verified : {
-        type : Boolean,
-        required : false,
-        default : false
-    },
-    token : {
-        type : String,
-        required : false,
-        default : "null"
+    google : {
+        id: String,
+        token: String,
+        email: String,
+        name: String
     }
 });
 

@@ -1,6 +1,7 @@
 var LocalStrategy = require('passport-local').Strategy;
 var FacebookStrategy = require('passport-facebook').Strategy;
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var auth = require('../config/auth');
 
 //Loading the User Model
 
@@ -31,7 +32,7 @@ module.exports = (passport) => {
             //Asynch
             //Function won't run unless data is sent back
             process.nextTick(() => {
-                User.findOne({'userName': username}, (err, user) => {
+                User.findOne({'local.userName': username}, (err, user) => {
                     if (err) {
                         console.log(err);
                         return done(err);
@@ -40,11 +41,11 @@ module.exports = (passport) => {
                         return done(null, false, req.flash('signupMessage', 'The username already exists'));
                     }
                     var newUser = new User();
-                    newUser.userName = username;
-                    newUser.password = newUser.generateHash(password);
-                    newUser.token = "bleh";
-                    newUser.email = 'bleh';
-                    newUser.verified = true;
+                    newUser.local.userName = username;
+                    newUser.local.password = newUser.generateHash(password);
+                    newUser.local.token = 'bleh';
+                    newUser.local.email = 'bleh';
+                    newUser.local.verified = true;
                     newUser.save((err) => {
                         if (err) console.log(err);
                         return done(null, newUser);
@@ -52,4 +53,34 @@ module.exports = (passport) => {
                 });
             });
         }));
-};
+
+    passport.use('google', new GoogleStrategy({
+        'clientID': "513821302879-1gk4m2sh9pfsg36oa4b92s8e9k2e4sib.apps.googleusercontent.com",
+        'clientSecret': "Hykhg8jzxc7B_bDV4k8MK8bd",
+        'callbackURL': "http://localhost:4000/auth/google/callback/"
+    }, 
+    (token, refreshToken, profile, done) => {
+        process.nextTick(() => {
+            User.findOne({'google.id': profile.id}, (err, user) => {
+                if (err) throw err;
+                if (user){
+                    done(null, user)
+                }
+                else{
+                    let newUser = new User();
+                    newUser.google.id = profile.id;
+                    newUser.google.token = token,
+                    newUser.google.name = profile.displayName;
+                    newUser.google.email = profile.emails[0].value;
+                    newUser.save(err => {
+                        if (err) throw err;
+                        else {
+                            return done(null, newUser);
+                        }
+                    });
+                }
+            })
+        })
+    })
+    );
+}

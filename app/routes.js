@@ -19,45 +19,25 @@ app.get('/login/', (req, res) => {
     res.render('login');
 });
 
-app.post('/login/', (req, res) => {
-    username = req.body.userName;
-    userModel.findOne({userName: username}, (err, people) => {
-        if (err) return res.status(404).send("User not found");
-        else if(req.body.token)
-        {
-            userModel.findOne({userName: people.username, token: req.body.token}, (err, people) => {
-                if (err) return res.status(401).send("Access Denied, Invalid Token");
-                else{
-                    res.status(200).send("Access Granted, Token valid");
-                }
-            })
-        }
-        else if (req.body.password)
-        {
-            userModel.findOne({userName: people.username, password: req.body.password}, (err, people) => {
-                if (err) return res.status(401).send("Access Denied, Invalid Password");
-                else{
-                    jwt.sign({userName: people.username, password: req.body.password, log: true}, secret, (err, token) => {
-                        userModel.findOneAndUpdate({userName: people.username, password: req.body.password, token: token}, (err, people) => {
-                            if (err) return console.log(err);
-                            else{
-                                res.status(200).send("Access Granted, Token Validated");
-                            }
-                        });
-                    });
-                }
-            })
-        }
-    })
-}
-);
+app.get('/auth/google/', passport.authenticate('google', {scope: ['profile', 'email']}));
 
-app.post('/logout/',  (req, res) => {
-    userName = req.body.userName;
-    userModel.findOneAndUpdate({userName: userName}, {token: 'null'}) 
-    .then(bleh => res.status(200).send("Successfully Logged out"))
-    .catch(err => res.status(500));
+app.get('/auth/google/callback', passport.authenticate('google', {
+    successRedirect: '/',
+    failureRedirect: '/login'
+}));
+
+app.get('/logout/',  (req, res) => {
+    console.log(req)
+    req.logout();
+    res.redirect('/');
 });
+
+let isLoggedin = (req, res, next) => {
+    if (req.isAuthenticated()){
+        return next();
+    }
+    res.redirect('/');
+}
 
 io.on('connection', (client) =>{
     client.on('ack', (msg) => {

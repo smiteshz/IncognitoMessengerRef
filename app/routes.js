@@ -1,6 +1,6 @@
 
 
-module.exports = (app, passport, io) => {
+module.exports = (app, passport, io, messaging) => {
 app.get('/', (req, res) => {
     res.render('startPage');
 });
@@ -11,13 +11,23 @@ app.get('/register/', (req, res) => {
 
 app.post('/register/', passport.authenticate('local-signup', {
     successRedirect: '/',
-    failureRedirect: '/login',
+    failureRedirect: '/register',
     failureFlash : true
 }));
 
 app.get('/login/', (req, res) => {
     res.render('login');
 });
+
+app.post('/login/', passport.authenticate('local-login',{
+    successRedirect: '/chatpage',
+    failureRedirect: '/register',
+    failureFlash: true
+}));
+
+app.get('/chatpage/', (req, res) => {
+    res.render('index');
+})
 
 app.get('/auth/google/', passport.authenticate('google', {scope: ['profile', 'email']}));
 
@@ -39,6 +49,9 @@ let isLoggedin = (req, res, next) => {
     res.redirect('/');
 }
 
+io.on('connection', client => messaging.connection(client));
+
+
 io.on('connection', (client) =>{
     client.on('ack', (msg) => {
         console.log('message: '+msg);
@@ -46,10 +59,7 @@ io.on('connection', (client) =>{
     console.log("Client is connected");
     client.on('message', (data) => {
         // Validate the token
-        token = data.token;
-        var decoded = jwt.verify(token, secret);
-        console.log("Decoded string:", decoded);
-        userModel.findOne({username: decoded.username, token: data.token},(err, person) => {
+        userModel.findOne({username: decoded.username},(err, person) => {
         if (err)
         {
             console.log(err);
@@ -76,11 +86,7 @@ io.on('connection', (client) =>{
     client.on('getmessages', (data) => {
         console.log('Getting Messages', data.userName);
         usrname = data.userName;
-        // Validate the token
-        token = data.token;
-        var decoded = jwt.verify(token, secret);
-        console.log("Decoded string:", decoded);
-        userModel.findOne({username: decoded.username, token: data.token},(err, person) => {
+        userModel.findOne({username: usrname},(err, person) => {
         if (err)
         {
             console.log(err);
@@ -97,12 +103,4 @@ io.on('connection', (client) =>{
     });
 }
 );
-tokenValidation = (tokenString) => {
-    var result = false;
-    decoded = jwt.verify(tokenString, secret);
-    userModel.findOne({userName: decoded.userName, password: decoded.password})
-    .then(detected => {result = true})
-    .catch(err => {result = false});
-    return result;
-}
 };

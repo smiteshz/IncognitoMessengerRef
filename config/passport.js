@@ -54,6 +54,32 @@ module.exports = (passport) => {
             });
         }));
 
+    passport.use('local-login', new LocalStrategy({
+        usernameField: 'userName',
+        passwordField: 'password',
+        passReqToCallback : true
+    }, (req, username, password, done) => {
+        process.nextTick(() => {
+            User.findOne({'local.userName': username}, (err, user) => {
+                if (err) throw err;
+                if (!user)
+                {
+                    console.log("User Not Found")
+                    return done(null, false, req.flash('loginMessage',"User not found, Please Register"));
+                }
+                if (!user.validPassword(password, user.local.password))
+                {
+                    console.log("Invalid Pasword")
+                    return done(null, false, req.flash('loginMessage', "Invalid Password"));
+                }
+                else{
+                    console.log("Login Successfull")
+                    return done(null, user);
+                }
+            })
+        })
+    }));
+
     passport.use('google', new GoogleStrategy({
         'clientID': "513821302879-1gk4m2sh9pfsg36oa4b92s8e9k2e4sib.apps.googleusercontent.com",
         'clientSecret': "Hykhg8jzxc7B_bDV4k8MK8bd",

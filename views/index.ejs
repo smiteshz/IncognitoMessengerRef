@@ -23,7 +23,7 @@
     <script>
         $(function () {
           var socket = io();
-          socket.emit('getmessages', {userName: 'smith', token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InNtaXRoIiwicGFzc3dvcmQiOiJzbWl0aDI0IiwiaWF0IjoxNTIzMDM0NDc0fQ.jmda6yXSIzZryLVxZB-KTBaEFClnhV4KZLseGTvi2Yo'});
+          socket.emit('getmessages', {userName: 'smitesh'});
           $('form').submit(function(){
             socket.emit('message', {senderName: 'smitesh', receiverName: 'smith',token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyTmFtZSI6InNtaXRlc2giLCJwYXNzd29yZCI6InNhd2FudCIsImlhdCI6MTUyMzA0NDE0Mn0.OXpSvAgmCjAdPSrOq_u8n8V3vRrvsHNxJFUPEFA1uXc', messageBody: $('#m').val(), timeSent: 213413});
             $('#m').val('');

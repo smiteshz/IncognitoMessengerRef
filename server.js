@@ -16,6 +16,8 @@ var passport = require('passport');
 var flash = require('connect-flash');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var messaging = require('./app/messaging');
+
 
 //Configuration
 mongoose.connect(configDB.url);
@@ -40,7 +42,7 @@ app.use(flash());
 
 // Redirecting the routes
 
-require('./app/routes')(app, passport, io);
+require('./app/routes')(app, passport, io, messaging);
 
 
 server.listen(port);

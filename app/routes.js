@@ -10,7 +10,7 @@ app.get('/register/', (req, res) => {
 });
 
 app.post('/register/', passport.authenticate('local-signup', {
-    successRedirect: '/',
+    successRedirect: '/login',
     failureRedirect: '/register',
     failureFlash : true
 }));
@@ -49,58 +49,65 @@ let isLoggedin = (req, res, next) => {
     res.redirect('/');
 }
 
-io.on('connection', client => messaging.connection(client));
+io.on('connection', client => {
+    messaging.connection(client)
+    client.on('message', payload => messaging.messageReceived(payload))
+    client.on('getmessages', payload=> messaging.messageFetcher(client, payload))
+    client.on('ack', (payload) => messaging.ack(payload));
+});
 
 
-io.on('connection', (client) =>{
-    client.on('ack', (msg) => {
-        console.log('message: '+msg);
-    });
-    console.log("Client is connected");
-    client.on('message', (data) => {
-        // Validate the token
-        userModel.findOne({username: decoded.username},(err, person) => {
-        if (err)
-        {
-            console.log(err);
-            client.emit('ack', "Unable to send message, authToken invalid");
-        }
-        else 
-        {   
-            console.log("Match found!");
-            let newMsg = new messageModel(
-                data
-            )
-            newMsg.save().then(result => {
-                console.log("Success!");
-                client.emit('ack', "Message successfully sent");
-            }).catch(err =>
-            {
-                console.log(err);
-                client.emit('ack', `Message sending failed,\n stack trace: ${err}`);
-            });
-        }
-    }); 
-    });
+// io.on('connection', (client) =>{
+//     client.on('ack', (msg) => {
+//         console.log('message: '+msg);
+//     });
+//     console.log("Client is connected");
+//     client.on('message', (data) => {
+//         // Validate the token
+//         userModel.findOne({username: decoded.username},(err, person) => {
+//         if (err)
+//         {
+//             console.log(err);
+//             client.emit('ack', "Unable to send message, authToken invalid");
+//         }
+//         else 
+//         {   
+//             console.log("Match found!");
+//             let newMsg = new messageModel(
+//                 data
+//             )
+//             newMsg.save().then(result => {
+//                 console.log("Success!");
+//                 client.emit('ack', "Message successfully sent");
+//             }).catch(err =>
+//             {
+//                 console.log(err);
+//                 client.emit('ack', `Message sending failed,\n stack trace: ${err}`);
+//             });
+//         }
+//     }); 
+//     });
 
-    client.on('getmessages', (data) => {
-        console.log('Getting Messages', data.userName);
-        usrname = data.userName;
-        userModel.findOne({username: usrname},(err, person) => {
-        if (err)
-        {
-            console.log(err);
-            client.emit('ack', "Unable to get messages, authToken invalid");
-        }
-        else 
-        {   
-            messageModel.find({receiverName : usrname}, (err, messages) => {
-                console.log(messages);
-                client.emit('retrievedmessages', messages);
-            })
-        }
-        });
-    });
-}
-);
+//     client.on('getmessages', (data) => {
+//         console.log('Getting Messages', data.userName);
+//         usrname = data.userName;
+//         userModel.findOne({username: usrname},(err, person) => {
+//         if (err)
+//         {
+//             console.log(err);
+//             client.emit('ack', "Unable to get messages, authToken invalid");
+//         }
+//         else 
+//         {   
+//             messageModel.find({receiverName : usrname}, (err, messages) => {
+//                 console.log(messages);
+//                 client.emit('retrievedmessages', messages);
+//             })
+//         }
+//         });
+//     });
+// }
+// );
+
+
 };

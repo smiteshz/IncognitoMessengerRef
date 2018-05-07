@@ -13,16 +13,6 @@ let userSchema = mongoose.Schema({
         email : {
             type : String
             // required : true
-        },
-        verified : {
-            type : Boolean,
-            // required : false,
-            default : false
-        },
-        token : {
-            type : String,
-            // required : false,
-            default : "null"
         }
     },
     google : {

@@ -51,11 +51,13 @@ let isLoggedin = (req, res, next) => {
 
 io.on('connection', client => {
     messaging.connection(client)
-    client.on('message', payload => messaging.messageReceived(payload))
-    client.on('getmessages', payload=> messaging.messageFetcher(client, payload))
+    client.on('message', payload => messaging.messageReceived(client, payload))
+    client.on('getmessages', payload => messaging.messageFetcher(client, payload))
+    client.on('introduction', payload => messaging.addOnlineUser(client, payload))
     client.on('ack', (payload) => messaging.ack(payload));
 });
 
+io.on('disconnection', client => messaging.disconnectUser(client));
 
 // io.on('connection', (client) =>{
 //     client.on('ack', (msg) => {

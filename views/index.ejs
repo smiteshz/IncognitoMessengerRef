@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
+    <title>Incognito Messenger 2.0</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
@@ -23,6 +23,9 @@
     <script>
         $(function () {
           var socket = io();
+          socket.on('you are connected', payload => {
+            socket.emit('introduction', {username : 'smitesh'})
+          })
           socket.emit('getmessages', {receiver: 'smitesh'});
           $('form').submit(function(){
             socket.emit('message', {sender: 'smitesh', receiver: 'smitesh', message: $('#m').val()});

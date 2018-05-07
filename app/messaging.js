@@ -1,12 +1,14 @@
 var User = require ('../app/models/user.schema');
 var Message = require ('../app/models/message.schema');
 
+let onlineClients = {};
+
 module.exports.connection = (client) => {
     console.log("User Connected !");
-    // console.log(client);
+    client.emit('you are connected', {connected: true, verified: false})
 }
 
-module.exports.messageReceived = payload => {
+module.exports.messageReceived = (client, payload) => {
     sender = payload.sender;
     receiver = payload.receiver;
     console.log("Message Received!")
@@ -23,6 +25,10 @@ module.exports.messageReceived = payload => {
                 newMessage.save(err => {
                     if (err) throw err;
                 })
+                if (onlineClients.hasOwnProperty(payload.receiver))
+                {
+                    onlineClients[payload.receiver].emit('message', payload.message);
+                }
             }
             else
             {
@@ -54,6 +60,19 @@ module.exports.messageFetcher = (client, payload) => {
             }
         })
     })
+}
+
+module.exports.addOnlineUser = (client, payload) => {
+    onlineClients[payload.username] = client;
+    console.log(`User succesfully added! ${payload.username}`);
+}
+
+module.exports.disconnectUser = client => {
+    for(var clients in onlineClients){
+        if (onlineClients[clients] == client){
+            delete onlineClients[clients];
+        }
+    }
 }
 
 module.exports.ack = (payload) => {

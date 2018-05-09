@@ -13,6 +13,9 @@ let userSchema = mongoose.Schema({
         email : {
             type : String
             // required : true
+        },
+        lastupdated: {
+            type : String
         }
     },
     google : {

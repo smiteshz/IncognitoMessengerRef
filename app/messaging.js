@@ -15,6 +15,10 @@ module.exports.messageReceived = (client, payload) => {
     process.nextTick(() => {
         User.findOne({'local.userName': payload.receiver}, (err, user) => {
             if (err) throw err;
+            if (payload.message == "")
+            {
+                return;
+            } 
             if (user)
             {
                 newMessage = new Message;

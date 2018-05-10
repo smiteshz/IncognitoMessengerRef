@@ -29,7 +29,7 @@
           socket.on('you are connected', payload => {
             socket.emit('introduction', {username : $('#messages').data('username')
           });
-          socket.emit('getmessages', {receiver: $('#r').val()});
+          socket.emit('getmessages', {receiver: $('#messages').data('username')});
           $('form').submit(function(){
             socket.emit('message', {sender: $('#messages').data('username'), receiver: $('#r').val() , message: $('#m').val()});
             $('#m').val('');

@@ -14,22 +14,24 @@
     </style>
   </head>
   <body>
-    <ul id="messages"></ul>
+    <ul id="messages" data-username= <%= user.local.userName %>  </ul>
     <form action="">
-      <input id = "s" autocomplete="off" />
-      <input id="m" autocomplete="off" /><input id = "r" autocomplete="off" /><button>Send</button>
+      <input id="m" autocomplete="off" />
+      <input id = "r" autocomplete="off" />
+      <button>Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
         $(function () {
+          $('body').css('background', 'green');
           var socket = io();
           socket.on('you are connected', payload => {
-            socket.emit('introduction', {username : 'smitesh'})
-          })
-          socket.emit('getmessages', {receiver: 'smitesh'});
+            socket.emit('introduction', {username : $('#messages').data('username')
+          });
+          socket.emit('getmessages', {receiver: $('#r').val()});
           $('form').submit(function(){
-            socket.emit('message', {sender: $('#s').val(), receiver: $('#r').val() , message: $('#m').val()});
+            socket.emit('message', {sender: $('#messages').data('username'), receiver: $('#r').val() , message: $('#m').val()});
             $('#m').val('');
             return false;
           });
@@ -43,7 +45,11 @@
             });
 
           });
+          $(window).on('load', function() {
+              $('body').css('background', 'yellow');
+          });
         });
+      })
       </script>
   </body>
 </html>

@@ -26,7 +26,8 @@ app.post('/login/', passport.authenticate('local-login',{
 }));
 
 app.get('/chatpage/', (req, res) => {
-    res.render('index');
+    //console.log(req);
+    res.render('index', {user: req.user});
 })
 
 app.get('/auth/google/', passport.authenticate('google', {scope: ['profile', 'email']}));

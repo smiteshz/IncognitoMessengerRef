@@ -13,7 +13,7 @@ module.exports.messageReceived = (client, payload) => {
     receiver = payload.receiver;
     console.log("Message Received!")
     process.nextTick(() => {
-        User.findOne({'local.username': payload.receiver}, (err, user) => {
+        User.findOne({'local.userName': payload.receiver}, (err, user) => {
             if (err) throw err;
             if (payload.message == "")
             {
@@ -43,9 +43,9 @@ module.exports.messageReceived = (client, payload) => {
 }
 
 module.exports.messageFetcher = (client, payload) => {
-    receiver = payload.receiver;
+    receiver = payload.username;
     process.nextTick(() => {
-        Message.find({'receiver': username}, (err, result) => {
+        Message.find({'receiver': receiver}, (err, result) => {
             if (err) throw err;
             if (result)
             {
@@ -81,7 +81,13 @@ module.exports.disconnectUser = client => {
 
 module.exports.addNewFriend = (req, res) => {
     process.nextTick(() => {
-        User.find({'local.username' : req.body.username})
+        User.findOneAndUpdate({'local.username' : req.body.username},
+         {"$push": {"friends": req.body.newFriend}},
+         {"new": true, "upsert": true}, 
+         (err, res) => {
+            if (err) throw err;
+            console.log("New Conversation added");
+        })
     })
 } 
 module.exports.ack = (payload) => {

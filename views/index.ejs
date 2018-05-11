@@ -12,14 +12,21 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
     </style>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
   </head>
   <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-4">FRIENDS LIST</div>
     <ul id="messages" data-username= <%= user.local.userName %>  </ul>
     <form action="">
       <input id="m" autocomplete="off" />
       <input id = "r" autocomplete="off" />
       <button>Send</button>
     </form>
+    </div>
+  </div>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
@@ -29,7 +36,7 @@
           socket.on('you are connected', payload => {
             socket.emit('introduction', {username : $('#messages').data('username')
           });
-          socket.emit('getmessages', {username : $('#messages').data('username')});
+          socket.emit('getmessages', {username: $('#messages').data('username')}, {from: });
           $('form').submit(function(){
             socket.emit('message', {sender: $('#messages').data('username'), receiver: $('#r').val() , message: $('#m').val()});
             $('#m').val('');

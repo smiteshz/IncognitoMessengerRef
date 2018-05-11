@@ -1,5 +1,5 @@
         ***    Checklist    ***
-    - Chat messeges should be targetted to the users. -- almost done
+    - Chat messeges should be targetted to the users. -- done
     - Fix schema for users and messages. -- almost done
     - Design Front End -- in progress
     - Deploy on AWS

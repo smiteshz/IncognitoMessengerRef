@@ -25,7 +25,7 @@ module.exports = (passport) => {
     });
 
     passport.use('local-signup', new LocalStrategy({
-        usernameField: 'userName',
+        usernameField: 'username',
         passwordField: 'password',
         passReqToCallback: true
         }, (req, username, password, done) => {
@@ -55,12 +55,12 @@ module.exports = (passport) => {
         }));
 
     passport.use('local-login', new LocalStrategy({
-        usernameField: 'userName',
+        usernameField: 'username',
         passwordField: 'password',
         passReqToCallback : true
     }, (req, username, password, done) => {
         process.nextTick(() => {
-            User.findOne({'local.userName': username}, (err, user) => {
+            User.findOne({'local.username': username}, (err, user) => {
                 if (err) throw err;
                 if (!user)
                 {

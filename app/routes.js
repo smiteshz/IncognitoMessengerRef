@@ -15,6 +15,10 @@ app.post('/register/', passport.authenticate('local-signup', {
     failureFlash : true
 }));
 
+app.post('/addfriend/', (req, res) =>  {
+    messaging.addNewFriend(req, res);
+})
+
 app.get('/login/', (req, res) => {
     res.render('login');
 });
